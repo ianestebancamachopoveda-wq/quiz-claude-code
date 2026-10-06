@@ -1,0 +1,808 @@
+<meta charset="utf-8">
+<title>Examen Claude Code</title>
+
+<style>
+  :root {
+    --bg: #F1F4F2;
+    --surface: #FFFFFF;
+    --surface-2: #F7FAF8;
+    --ink: #101A18;
+    --muted: #56685F;
+    --line: #DAE3DE;
+    --line-strong: #C3D0CA;
+    --accent: #0D7A70;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #DDEEEB;
+    --ok: #14684A;
+    --ok-soft: #DCEEE3;
+    --bad: #A4372F;
+    --bad-soft: #F6E3E0;
+    --shadow: 0 1px 2px rgba(16, 26, 24, .05), 0 8px 24px -16px rgba(16, 26, 24, .25);
+
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --col: 44rem;
+    --r: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0B1312;
+      --surface: #141E1C;
+      --surface-2: #182422;
+      --ink: #E5EDEA;
+      --muted: #8DA39D;
+      --line: #24332F;
+      --line-strong: #33463F;
+      --accent: #48C9B9;
+      --accent-ink: #04201D;
+      --accent-soft: #13302B;
+      --ok: #63C492;
+      --ok-soft: #123023;
+      --bad: #E2938E;
+      --bad-soft: #331E1C;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0B1312;
+    --surface: #141E1C;
+    --surface-2: #182422;
+    --ink: #E5EDEA;
+    --muted: #8DA39D;
+    --line: #24332F;
+    --line-strong: #33463F;
+    --accent: #48C9B9;
+    --accent-ink: #04201D;
+    --accent-soft: #13302B;
+    --ok: #63C492;
+    --ok-soft: #123023;
+    --bad: #E2938E;
+    --bad-soft: #331E1C;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -16px rgba(0, 0, 0, .8);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: var(--col);
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* ---------- barra superior ---------- */
+
+  .bar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .bar-inner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 3.5rem;
+  }
+
+  .bar-id {
+    font-family: var(--mono);
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .track {
+    flex: 1;
+    height: 4px;
+    background: var(--line);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .track > i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width .25s ease;
+  }
+
+  .bar-count {
+    font-family: var(--mono);
+    font-size: .8rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* ---------- tipografía base ---------- */
+
+  h1 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2rem, 6vw, 2.9rem);
+    line-height: 1.1;
+    letter-spacing: -.015em;
+    text-wrap: balance;
+    margin: 0;
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1.35rem;
+    line-height: 1.25;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: .72rem;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0;
+  }
+
+  .lede {
+    color: var(--muted);
+    font-size: 1.02rem;
+    max-width: 34rem;
+    margin: 0;
+  }
+
+  /* ---------- pantallas ---------- */
+
+  .screen { display: none; }
+  .screen.on { display: block; }
+
+  .stack { display: flex; flex-direction: column; }
+
+  #setup > .wrap.stack { gap: 1.5rem; padding-block: clamp(2.5rem, 9vw, 4.5rem) 4rem; }
+
+  .rule {
+    height: 1px;
+    background: var(--line);
+    border: 0;
+    margin: 0;
+  }
+
+  /* ---------- formulario de arranque ---------- */
+
+  .field { display: flex; flex-direction: column; gap: .45rem; }
+
+  .field label {
+    font-family: var(--mono);
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .field .hint {
+    font-size: .85rem;
+    color: var(--muted);
+  }
+
+  input[type="text"] {
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r);
+    padding: .7rem .85rem;
+    width: 100%;
+  }
+
+  input[type="text"]:focus-visible,
+  button:focus-visible,
+  .opt:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .btn {
+    font: inherit;
+    font-weight: 600;
+    background: var(--accent);
+    color: var(--accent-ink);
+    border: 1px solid var(--accent);
+    border-radius: var(--r);
+    padding: .75rem 1.4rem;
+    cursor: pointer;
+    align-self: flex-start;
+  }
+
+  .btn:hover { filter: brightness(1.07); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+
+  .btn.ghost {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--line-strong);
+  }
+
+  .btn.small { padding: .5rem 1rem; font-size: .9rem; font-weight: 500; }
+
+  /* ---------- preguntas ---------- */
+
+  #quiz > .wrap.stack { gap: 1.25rem; padding-block: 2.5rem 6rem; }
+
+  .q {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    padding: 1.25rem 1.25rem 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: .9rem;
+    min-width: 0;
+  }
+
+  .q-head { display: flex; flex-direction: column; gap: .5rem; }
+
+  .q-meta {
+    display: flex;
+    align-items: baseline;
+    gap: .6rem;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .q-num {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .q-mod { color: var(--muted); }
+
+  .q-text {
+    font-family: var(--serif);
+    font-size: 1.18rem;
+    line-height: 1.35;
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  .opts { display: flex; flex-direction: column; gap: .4rem; }
+
+  .opt {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    gap: .65rem;
+    align-items: start;
+    padding: .6rem .75rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--surface-2);
+    transition: border-color .12s ease, background .12s ease;
+  }
+
+  .opt:hover { border-color: var(--line-strong); }
+
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+
+  .opt-key {
+    font-family: var(--mono);
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .opt-txt { font-size: .96rem; }
+
+  .opt:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+
+  .opt:has(input:checked) .opt-key { color: var(--accent); }
+
+  /* ---------- estado calificado ---------- */
+
+  .graded .opt { cursor: default; }
+  .graded .opt:hover { border-color: var(--line); }
+
+  .graded .opt.is-ok {
+    border-color: var(--ok);
+    background: var(--ok-soft);
+  }
+
+  .graded .opt.is-ok .opt-key { color: var(--ok); }
+
+  .graded .opt.is-bad {
+    border-color: var(--bad);
+    background: var(--bad-soft);
+  }
+
+  .graded .opt.is-bad .opt-key { color: var(--bad); }
+
+  .graded .opt:has(input:checked):not(.is-ok):not(.is-bad) {
+    border-color: var(--line);
+    background: var(--surface-2);
+  }
+
+  .verdict {
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .1rem .5rem;
+    border-radius: 99px;
+  }
+
+  .verdict.ok { color: var(--ok); background: var(--ok-soft); }
+  .verdict.bad { color: var(--bad); background: var(--bad-soft); }
+
+  .timer {
+    font-family: var(--mono);
+    font-size: .78rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .timer.urgent { color: var(--bad); }
+
+  .why {
+    display: none;
+    margin: 0;
+    font-size: .92rem;
+    color: var(--muted);
+    border-left: 2px solid var(--accent);
+    padding-left: .85rem;
+  }
+
+  .graded .why { display: block; }
+
+  .why b {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  /* ---------- resultados ---------- */
+
+  .result {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .score {
+    display: flex;
+    align-items: baseline;
+    gap: .75rem;
+    flex-wrap: wrap;
+  }
+
+  .score-big {
+    font-family: var(--serif);
+    font-size: 3rem;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .score-of {
+    font-family: var(--mono);
+    font-size: .85rem;
+    color: var(--muted);
+  }
+
+  .score-note {
+    font-size: .95rem;
+    color: var(--muted);
+    margin-left: auto;
+    text-align: right;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: .45rem .5rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  th {
+    font-family: var(--mono);
+    font-size: .68rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  td.n {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: 0; }
+
+  .tbl-scroll { overflow-x: auto; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: .6rem; }
+
+  .footnote {
+    font-size: .82rem;
+    color: var(--muted);
+    padding: 0 0 3rem;
+  }
+
+  .footnote a { color: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+
+  @media print {
+    .bar, .actions, .btn { display: none !important; }
+    body { background: #fff; color: #000; }
+    .q { break-inside: avoid; box-shadow: none; }
+  }
+</style>
+
+<div class="bar" id="bar" hidden>
+  <div class="wrap bar-inner">
+    <span class="bar-id" id="barId">Examen</span>
+    <span class="track"><i id="trackFill"></i></span>
+    <span class="bar-count" id="barCount">0/0</span>
+  </div>
+</div>
+
+<main>
+  <!-- ============ PANTALLA 1: ARRANQUE ============ -->
+  <section class="screen on" id="setup">
+    <div class="wrap stack">
+      <div class="stack" style="gap:.85rem">
+        <p class="eyebrow">Claude Code 2026 · 17 módulos</p>
+        <h1>Examen del curso</h1>
+        <p class="lede">
+          Te tocan <b>10 preguntas al azar</b> de un banco de
+          <b id="totalBank">0</b>, con las opciones en orden diferente para cada quien.
+          Tienes <b>45 segundos</b> por pregunta: si se acaba el tiempo, pasa sola
+          a la siguiente. Escribe tu nombre para generar tu examen.
+        </p>
+      </div>
+
+      <hr class="rule">
+
+      <div class="field">
+        <label for="nombre">Tu nombre</label>
+        <input type="text" id="nombre" autocomplete="name" placeholder="Nombre y apellido" spellcheck="false">
+        <span class="hint">Define qué preguntas te tocan. El mismo nombre siempre genera el mismo examen.</span>
+      </div>
+
+      <button class="btn" id="start">Empezar el examen</button>
+
+      <p class="footnote" style="padding-bottom:0">
+        Banco de preguntas sobre el curso de Ben (Imperio Agéntico).
+        10 preguntas, 45 segundos cada una. Una vez que el tiempo de una
+        pregunta se acaba, no se puede volver atrás.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 2: EXAMEN ============ -->
+  <section class="screen" id="quiz">
+    <div class="wrap stack">
+      <div id="resultSlot"></div>
+      <form id="form" class="stack" style="gap:1.25rem"></form>
+      <div class="actions" id="bottomActions">
+        <button class="btn" id="next" type="button">Siguiente</button>
+        <button class="btn ghost" id="restart" type="button">Empezar de nuevo</button>
+      </div>
+      <p class="footnote" id="seedNote"></p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const BANCO = {"curso":"Claude Code 2026 · Curso Completo en Español","autor":"Ben — Imperio Agéntico","video":"https://www.youtube.com/watch?v=h49d1-d_fYk","modulos":{"0":"Bienvenida y mapa del curso","1":"El ecosistema Claude","2":"Instalación en Mac y Windows","3":"La interfaz: sesiones, modelos, esfuerzo y permisos","4":"Tu primer proyecto: landing publicada con Vercel","5":"Tokens, límites y ventana de contexto","6":"Control: permisos, Plan Mode y checkpoints","7":"CLAUDE.md, memoria y estructura de archivos","8":"Skills","9":"MCP y conectores","10":"Subagentes y trabajo en paralelo","11":"Loops: que trabaje solo","12":"Automatización 24/7: Routines y n8n","13":"El agente investigador: navegador sin API","14":"Tu segundo cerebro en Obsidian","15":"Proyecto final: media buyer con Meta MCP","16":"Próximos pasos y buenas prácticas"},"preguntas":[{"id":1,"modulo":1,"dificultad":"básica","pregunta":"¿Cuál es la diferencia de fondo entre Claude Chat y Claude Code?","opciones":["Claude Code ejecuta acciones sobre tus archivos y programas; Chat responde con texto","Claude Code usa un modelo más pequeño y por eso es más rápido","Claude Chat funciona sin conexión a internet","Claude Code solo sirve si sabes lenguajes de programación"],"correcta":0,"explicacion":"Code es un agente con herramientas: lee, escribe, ejecuta comandos y navega. Chat te devuelve una respuesta y tú haces el trabajo."},{"id":2,"modulo":1,"dificultad":"básica","pregunta":"Que el curso sea “sin programar” significa que…","opciones":["Claude escribe el código y tu trabajo es dirigir y validar el resultado","No se genera código en ningún momento","Solo se usan plantillas prehechas que no se pueden modificar","Todo el trabajo se hace desde una hoja de cálculo"],"correcta":0,"explicacion":"Sí hay código: lo escribe el agente. Lo que no necesitas es saber escribirlo, sino saber pedir y revisar."},{"id":3,"modulo":1,"dificultad":"media","pregunta":"Cuando instalas Claude Code en tu computador, ¿dónde ocurre el trabajo?","opciones":["En tu máquina, con acceso a las carpetas y programas que tú le abras","Siempre en la nube de Anthropic, sin tocar tu disco","Dentro del navegador, aislado del resto del sistema","En un servidor de Vercel asignado a tu cuenta"],"correcta":0,"explicacion":"Por eso importa desde qué carpeta lo abres: ese es su campo de trabajo."},{"id":4,"modulo":0,"dificultad":"básica","pregunta":"¿Qué plan pide el curso como mínimo para seguirlo paso a paso?","opciones":["Claude Pro, unos 17 dólares al mes","La versión gratuita alcanza para todo el curso","Claude Max, el plan más alto","Acceso por API con pago por consumo"],"correcta":0,"explicacion":"El curso arranca en Pro y muestra en qué momento se llena la cuota y qué hacer cuando pasa."},{"id":5,"modulo":2,"dificultad":"básica","pregunta":"¿Es obligatorio usar el terminal para instalar Claude Code?","opciones":["No: se puede instalar desde la app de escritorio, en Mac y en Windows","Sí, solo se instala por terminal con un comando de npm","Solo en Windows hace falta terminal","Sí, y además necesitas instalar Docker antes"],"correcta":0,"explicacion":"La app de escritorio cubre la instalación completa sin escribir un solo comando."},{"id":6,"modulo":2,"dificultad":"media","pregunta":"Antes de pedirle nada, lo primero que conviene hacer al empezar un proyecto es…","opciones":["Abrir Claude Code apuntando a la carpeta de ese proyecto","Copiar todos los archivos al escritorio para tenerlos a mano","Crear un repositorio en GitHub","Desactivar el antivirus para que no interfiera"],"correcta":0,"explicacion":"El directorio de trabajo define qué puede ver y tocar el agente. Abrirlo en el lugar equivocado es el error de arranque más común."},{"id":7,"modulo":2,"dificultad":"media","pregunta":"Tu instalación se comporta raro y quieres diagnosticarla. ¿Qué comando usas?","opciones":["/doctor","/debug","/fix","/repair"],"correcta":0,"explicacion":"/doctor revisa el estado de la instalación y reporta lo que encuentra mal."},{"id":8,"modulo":3,"dificultad":"básica","pregunta":"Terminaste una tarea y vas a empezar otra que no tiene nada que ver. ¿Qué haces?","opciones":["/clear, para arrancar con el contexto limpio","Cerrar el programa y volver a instalarlo","Seguir escribiendo: da lo mismo, el agente separa los temas solo","/compact, que siempre es la mejor opción"],"correcta":0,"explicacion":"Arrastrar la tarea anterior gasta contexto y confunde al agente con información que ya no aplica."},{"id":9,"modulo":3,"dificultad":"básica","pregunta":"Quieres retomar una conversación que dejaste a medias ayer. ¿Qué usas?","opciones":["/resume","/reload","/history","/open"],"correcta":0,"explicacion":"/resume lista tus sesiones anteriores para continuar donde ibas."},{"id":10,"modulo":3,"dificultad":"media","pregunta":"Sobre la elección de modelo, ¿qué afirmación es correcta?","opciones":["Un modelo más capaz razona mejor pero consume más cuota","Todos los modelos consumen exactamente lo mismo","Haiku es el modelo más capaz de la familia","El modelo se fija al inicio y no se puede cambiar durante la sesión"],"correcta":0,"explicacion":"La decisión es de economía: el modelo grande para lo difícil, uno más liviano para lo mecánico."},{"id":11,"modulo":3,"dificultad":"media","pregunta":"Subir el nivel de esfuerzo (razonamiento) sirve para…","opciones":["Que piense más antes de actuar en tareas difíciles, a cambio de más tiempo y tokens","Que escriba respuestas más largas y detalladas","Acelerar la respuesta","Desbloquear herramientas que de otro modo no están disponibles"],"correcta":0,"explicacion":"Es un dial de profundidad, no de extensión. En tareas simples solo encarece."},{"id":12,"modulo":4,"dificultad":"básica","pregunta":"En el proyecto de la landing, ¿qué papel cumple Vercel?","opciones":["Publica el sitio en internet y te da una URL propia","Diseña el logo y la identidad visual","Escribe los textos de la página","Registra el nombre de la marca"],"correcta":0,"explicacion":"Vercel es el hosting: toma los archivos y los deja accesibles con un enlace."},{"id":13,"modulo":4,"dificultad":"media","pregunta":"Para que Claude Code construya una landing que sirva, lo que más necesita de ti es…","opciones":["Un brief concreto: a quién le habla, qué debe lograr la página y qué secciones lleva","El código HTML de referencia","Una cuenta de GitHub configurada","Un diseño terminado en Figma"],"correcta":0,"explicacion":"El agente resuelve el cómo. El qué y el para quién siguen siendo tuyos."},{"id":14,"modulo":4,"dificultad":"básica","pregunta":"Ya publicaste el sitio y quieres cambiar una sección. El flujo correcto es…","opciones":["Pedir el cambio, revisar cómo quedó y volver a desplegar","Rehacer el sitio completo desde cero","Editar el código directamente en el panel de Vercel","Una vez publicado no se puede modificar"],"correcta":0,"explicacion":"Publicar no es el final: el ciclo pedir → revisar → desplegar se repite las veces que haga falta."},{"id":15,"modulo":5,"dificultad":"básica","pregunta":"La ventana de contexto es…","opciones":["El máximo de información que el modelo puede tener presente a la vez","El tiempo máximo que puede durar una sesión","El límite de mensajes mensuales de tu plan","El tamaño máximo de un archivo que puede abrir"],"correcta":0,"explicacion":"Es memoria de trabajo, no memoria permanente: cuando se llena, hay que resumir o limpiar."},{"id":16,"modulo":5,"dificultad":"básica","pregunta":"¿Qué son los tokens?","opciones":["Fragmentos de texto que se cuentan tanto al entrar como al salir","Créditos que se compran por separado de la suscripción","Los archivos que el agente tiene abiertos","Los permisos que le has concedido"],"correcta":0,"explicacion":"Todo lo que lee y todo lo que escribe cuenta. Por eso pegar un archivo entero sale caro."},{"id":17,"modulo":5,"dificultad":"media","pregunta":"¿Qué hace /compact?","opciones":["Resume la conversación para liberar contexto y conservar lo esencial","Borra la conversación completa sin dejar rastro","Comprime el proyecto en un archivo zip","Cambia automáticamente a un modelo más económico"],"correcta":0,"explicacion":"Sirve cuando vas a media tarea y no quieres perder el hilo, pero el contexto se está llenando."},{"id":18,"modulo":5,"dificultad":"media","pregunta":"¿En qué se diferencian /clear y /compact?","opciones":["/clear vacía el contexto; /compact lo resume y te deja seguir","Son dos nombres para lo mismo","/clear cierra el programa","/compact borra archivos del proyecto"],"correcta":0,"explicacion":"/clear para cambiar de tema; /compact para seguir con el mismo tema cuando ya no cabe."},{"id":19,"modulo":5,"dificultad":"avanzada","pregunta":"La forma más económica de que el agente trabaje con un documento largo es…","opciones":["Decirle dónde está el archivo para que lea solo la parte que necesita","Pegar todo el contenido dentro del chat","Mandarlo como capturas de pantalla","Partirlo en veinte mensajes seguidos"],"correcta":0,"explicacion":"Si lo pegas, todo entra al contexto sí o sí. Si lo referencias, el agente decide cuánto abrir."},{"id":20,"modulo":5,"dificultad":"avanzada","pregunta":"Se te acabó la cuota a mitad de mes. ¿Cuál es la causa más probable?","opciones":["Sesiones larguísimas sin limpiar contexto y con el modelo más caro puesto","Tener demasiados archivos guardados en la carpeta del proyecto","Usar Windows en vez de Mac","Trabajar en varios proyectos distintos"],"correcta":0,"explicacion":"Cada mensaje reenvía el contexto acumulado. Una sesión que nunca se limpia se vuelve cara sola."},{"id":21,"modulo":6,"dificultad":"básica","pregunta":"¿Para qué sirve el Plan Mode?","opciones":["Para que proponga un plan sin tocar nada, y tú apruebes antes de que ejecute","Para programar tareas en una fecha futura","Para cambiar de plan de suscripción","Para elegir con qué modelo trabajar"],"correcta":0,"explicacion":"Es la forma barata de detectar que entendió mal: te enteras antes de que modifique archivos."},{"id":22,"modulo":6,"dificultad":"media","pregunta":"¿Con qué atajo se cambia entre los modos de permisos?","opciones":["Shift + Tab","Ctrl + P","Alt + M","Escribiendo /permisos"],"correcta":0,"explicacion":"Shift + Tab cicla entre los modos sin salir de lo que estás escribiendo."},{"id":23,"modulo":6,"dificultad":"avanzada","pregunta":"Aceptar ediciones automáticamente es una buena idea cuando…","opciones":["La tarea es acotada, reversible y tú estás mirando lo que hace","Siempre: es más rápido y evita interrupciones","Trabajas sobre archivos que no tienen ninguna copia de respaldo","El agente va a ejecutar comandos que borran cosas"],"correcta":0,"explicacion":"El criterio es la reversibilidad. Si deshacerlo es fácil, automatiza; si no, revisa uno por uno."},{"id":24,"modulo":6,"dificultad":"media","pregunta":"¿Qué te permiten los checkpoints?","opciones":["Volver a un estado anterior cuando el agente tomó un camino equivocado","Guardar tu suscripción para el mes siguiente","Pausar el cobro mientras no trabajas","Exportar la conversación a PDF"],"correcta":0,"explicacion":"Son la red de seguridad: te dejan experimentar sabiendo que hay marcha atrás."},{"id":25,"modulo":6,"dificultad":"media","pregunta":"El modo que se salta todas las confirmaciones…","opciones":["Es el más riesgoso: el agente actúa sin pedirte permiso en ningún paso","Es el recomendado por defecto para trabajar cómodo","Solo está disponible en Mac","Desactiva el acceso a internet como compensación"],"correcta":0,"explicacion":"Tiene su lugar en tareas controladas y aisladas, pero no como forma habitual de trabajar."},{"id":26,"modulo":7,"dificultad":"básica","pregunta":"¿Qué es CLAUDE.md?","opciones":["Un archivo de instrucciones que el agente lee al iniciar cada sesión","Un registro automático de los errores que ocurrieron","El archivo donde se configuran los permisos","El detalle de consumo y facturación"],"correcta":0,"explicacion":"Es la memoria entre sesiones: lo que no quieres repetir cada vez que abres el proyecto."},{"id":27,"modulo":7,"dificultad":"básica","pregunta":"¿Qué comando genera un CLAUDE.md inicial analizando tu proyecto?","opciones":["/init","/start","/memory","/setup"],"correcta":0,"explicacion":"/init recorre el proyecto y redacta un primer borrador que después tú ajustas."},{"id":28,"modulo":7,"dificultad":"avanzada","pregunta":"¿Qué diferencia al CLAUDE.md del proyecto del que vive en tu carpeta personal?","opciones":["El del proyecto aplica solo a ese proyecto y se comparte con el equipo; el personal aplica a todos tus proyectos","Son el mismo archivo en dos ubicaciones distintas","El personal siempre tiene prioridad absoluta sobre el del proyecto","El del proyecto solo funciona si usas git"],"correcta":0,"explicacion":"Reglas del proyecto arriba del proyecto; manías tuyas en el personal, para que te acompañen a todas partes."},{"id":29,"modulo":7,"dificultad":"media","pregunta":"¿Qué NO deberías escribir nunca en un CLAUDE.md?","opciones":["Contraseñas y claves de API","El nombre y el propósito del proyecto","Reglas de estilo y de tono","Los comandos que usas con frecuencia"],"correcta":0,"explicacion":"Es un archivo de texto plano que suele compartirse. Las credenciales van en variables de entorno."},{"id":30,"modulo":7,"dificultad":"avanzada","pregunta":"Un buen CLAUDE.md es…","opciones":["Corto y concreto, centrado en lo que no se deduce mirando los archivos","Lo más largo posible, para que no falte nada","Una copia literal del README","Un listado de todos los archivos del proyecto"],"correcta":0,"explicacion":"Todo lo que escribas ahí ocupa contexto en cada sesión. Documentar lo obvio se paga en tokens."},{"id":31,"modulo":8,"dificultad":"básica","pregunta":"¿Qué es una Skill?","opciones":["Un procedimiento tuyo escrito una vez para que el agente lo repita siempre igual","Un modelo entrenado especialmente con tus datos","Un complemento de pago del marketplace","Una extensión que se instala en el navegador"],"correcta":0,"explicacion":"Es tu criterio convertido en proceso: deja de vivir en tu cabeza y pasa a ejecutarse igual cada vez."},{"id":32,"modulo":8,"dificultad":"avanzada","pregunta":"¿Qué determina que una Skill se active sola en el momento adecuado?","opciones":["Su descripción, donde explicas en qué situaciones debe usarse","El nombre del archivo","El orden alfabético entre las skills instaladas","El modelo que tengas seleccionado"],"correcta":0,"explicacion":"La descripción es lo único que el agente ve antes de decidir. Una descripción vaga es una skill que nunca se dispara."},{"id":33,"modulo":8,"dificultad":"media","pregunta":"¿Cuál es la mejor candidata a convertirse en Skill?","opciones":["Una tarea que repites seguido y siempre con los mismos pasos","Una tarea que harás una sola vez en la vida","Una tarea que cambia por completo cada vez","Una tarea para la que todavía no tienes criterio definido"],"correcta":0,"explicacion":"Sin repetición no hay retorno, y sin pasos estables no hay nada que escribir."},{"id":34,"modulo":8,"dificultad":"básica","pregunta":"Además de activarse sola, ¿cómo puedes invocar una Skill a mano?","opciones":["Escribiendo una barra y su nombre","Haciendo doble clic sobre su archivo","Solo desde la versión web","Reiniciando la sesión"],"correcta":0,"explicacion":"Las skills aparecen como comandos, así que puedes forzarlas cuando sabes que aplican."},{"id":35,"modulo":9,"dificultad":"básica","pregunta":"¿Qué es MCP?","opciones":["Un estándar abierto para conectar el agente con herramientas y datos externos","Un formato de archivo donde se guarda la memoria","Una versión más rápida del modelo","Un gestor de contraseñas integrado"],"correcta":0,"explicacion":"Model Context Protocol: define cómo un agente descubre y usa herramientas de terceros."},{"id":36,"modulo":9,"dificultad":"media","pregunta":"¿Por qué se le llama “el traductor universal”?","opciones":["Porque un mismo conector sirve para cualquier cliente compatible, sin integración a medida","Porque traduce automáticamente entre idiomas","Porque convierte archivos de un formato a otro","Porque traduce código entre lenguajes de programación"],"correcta":0,"explicacion":"Antes cada aplicación necesitaba su propia integración. Con MCP se escribe una vez y sirve para todos."},{"id":37,"modulo":9,"dificultad":"básica","pregunta":"¿Qué comando usas para ver y gestionar tus conexiones MCP?","opciones":["/mcp","/connect","/tools","/plugins"],"correcta":0,"explicacion":"/mcp lista los servidores conectados y su estado."},{"id":38,"modulo":9,"dificultad":"avanzada","pregunta":"Antes de conectar un MCP a una cuenta real de tu negocio conviene…","opciones":["Entender qué permisos concede y empezar por lo de solo lectura","Concederle todos los permisos para evitar errores a mitad de camino","Compartir tus claves dentro del chat para que las tenga a mano","Desactivar la verificación en dos pasos de esa cuenta"],"correcta":0,"explicacion":"Un conector con permisos de escritura puede modificar datos reales. Se abre de a poco."},{"id":39,"modulo":13,"dificultad":"media","pregunta":"La herramienta que necesitas no tiene API ni servidor MCP. ¿Qué opción te queda?","opciones":["Automatizar el navegador para operarla igual que lo harías tú","Ninguna: sin API es imposible integrarla","Programar un modelo nuevo desde cero","Copiar y pegar todo a mano indefinidamente"],"correcta":0,"explicacion":"Si una persona puede hacerlo con un navegador, el agente también. Es la vía de último recurso, y funciona."},{"id":40,"modulo":10,"dificultad":"media","pregunta":"¿Cuál es la ventaja principal de delegar en un subagente?","opciones":["Trabaja en su propio contexto y te devuelve solo la conclusión","No consume tokens","Usa un modelo gratuito que no descuenta de tu cuota","No necesita permisos para actuar"],"correcta":0,"explicacion":"Toda la exploración sucia se queda en su contexto. El tuyo recibe el resultado limpio."},{"id":41,"modulo":10,"dificultad":"avanzada","pregunta":"Lanzar varios subagentes en paralelo tiene sentido cuando…","opciones":["Las tareas son independientes entre sí","Cada paso necesita el resultado del paso anterior","Quieres reducir el consumo de tokens","Siempre, sin excepción: es más rápido"],"correcta":0,"explicacion":"Si hay dependencia, el paralelismo no sirve: unos esperarían a otros o trabajarían con datos incompletos."},{"id":42,"modulo":10,"dificultad":"avanzada","pregunta":"Un subagente arranca…","opciones":["Sin la conversación previa: hay que darle el encargo completo","Con todo tu historial de la sesión cargado","Con acceso a las contraseñas guardadas en tu navegador","En otro computador distinto al tuyo"],"correcta":0,"explicacion":"Empieza en frío. Un encargo a medias produce un resultado a medias."},{"id":43,"modulo":10,"dificultad":"media","pregunta":"¿Cómo se define un subagente propio?","opciones":["En un archivo con su nombre, la descripción de cuándo usarlo y las herramientas que puede tocar","Desde el panel web de Anthropic","Únicamente con un comando de terminal","No se pueden personalizar: vienen fijos"],"correcta":0,"explicacion":"Limitar sus herramientas es parte del diseño: un agente que solo lee no puede romper nada."},{"id":44,"modulo":11,"dificultad":"básica","pregunta":"¿Para qué sirve un loop?","opciones":["Para repetir una tarea cada cierto intervalo, por ejemplo vigilar si algo cambió","Para repetir la última respuesta del agente","Para duplicar la carpeta del proyecto","Para reintentar automáticamente cuando aparece un error"],"correcta":0,"explicacion":"Es trabajo desatendido: el agente vuelve solo cada tanto sin que tú lo llames."},{"id":45,"modulo":11,"dificultad":"avanzada","pregunta":"¿Cuál es el riesgo de dejar un loop corriendo sin criterio de salida?","opciones":["Quemar cuota repitiendo trabajo sobre algo que no ha cambiado","Corromper los archivos del proyecto","Perder el acceso a tu cuenta","Ninguno: los loops se detienen solos"],"correcta":0,"explicacion":"Cada vuelta cuesta. El intervalo debe corresponder a la velocidad real a la que cambia lo que vigilas."},{"id":46,"modulo":12,"dificultad":"media","pregunta":"¿Qué diferencia a una Routine de un loop corriendo en tu máquina?","opciones":["La Routine corre en la nube según un horario, sin necesidad de tener tu computador encendido","La Routine siempre resulta más económica","El loop no necesita permisos de ningún tipo","Son exactamente lo mismo con otro nombre"],"correcta":0,"explicacion":"Si apagas el portátil, el loop local muere. La routine sigue."},{"id":47,"modulo":12,"dificultad":"básica","pregunta":"¿Qué es n8n?","opciones":["Una herramienta de automatización visual que conecta aplicaciones mediante nodos","Un modelo de lenguaje alternativo a Claude","Un editor de código","Un servicio de hosting de páginas web"],"correcta":0,"explicacion":"Encadenas disparador, pasos y acciones arrastrando bloques, sin escribir código."},{"id":48,"modulo":12,"dificultad":"media","pregunta":"Al montar un cotizador que responde clientes solo, lo primero que hay que definir es…","opciones":["El disparador: qué evento concreto pone en marcha el flujo","El color de los botones del formulario","Qué modelo caro se va a usar","El dominio donde vivirá"],"correcta":0,"explicacion":"Sin disparador claro no hay automatización: hay un proceso que alguien tiene que arrancar a mano."},{"id":49,"modulo":13,"dificultad":"media","pregunta":"Que un agente haga scraping con navegador significa que…","opciones":["Abre el sitio y lee lo que aparece en pantalla, como haría una persona","Descarga la base de datos interna del sitio","Usa la API oficial con una clave","Compra los datos a un proveedor externo"],"correcta":0,"explicacion":"Trabaja sobre lo que se ve, no sobre lo que hay detrás. Por eso funciona aunque no exista API."},{"id":50,"modulo":13,"dificultad":"avanzada","pregunta":"Al automatizar la lectura de un sitio público, lo responsable es…","opciones":["Respetar sus términos de uso y no saturarlo con peticiones","Ir lo más rápido posible para terminar antes","Rotar entre varias cuentas falsas","Ignorar los términos: son datos públicos"],"correcta":0,"explicacion":"Que un dato sea visible no significa que su uso sea libre. Es un límite legal, no una opinión."},{"id":51,"modulo":14,"dificultad":"media","pregunta":"¿Por qué Claude Code se lleva tan bien con Obsidian?","opciones":["Un vault son archivos de texto en tu disco: los puede leer y escribir directamente","Obsidian tiene un plugin oficial desarrollado por Anthropic","Porque Obsidian guarda todo en la nube","Porque usa una base de datos que el agente consulta"],"correcta":0,"explicacion":"No hace falta integración: son carpetas y archivos .md, exactamente lo que el agente ya sabe manejar."},{"id":52,"modulo":14,"dificultad":"básica","pregunta":"El valor de un segundo cerebro con notas enlazadas está en que…","opciones":["Las ideas quedan conectadas entre sí y se pueden recuperar cuando hacen falta","Permite guardar archivos muy pesados","Sustituye al correo electrónico","Hace copias de seguridad automáticas del computador"],"correcta":0,"explicacion":"El valor no está en acumular notas, sino en las relaciones entre ellas."},{"id":53,"modulo":15,"dificultad":"avanzada","pregunta":"Conectar Meta por MCP permite…","opciones":["Cerrar el ciclo completo: generar el creativo, subirlo, medir resultados y ajustar","Reducir el costo por clic de forma automática","Saltarse la revisión de anuncios de la plataforma","Garantizar que las campañas queden aprobadas"],"correcta":0,"explicacion":"El conector da acceso a la operación y a los datos. La estrategia sigue siendo decisión tuya."},{"id":54,"modulo":15,"dificultad":"media","pregunta":"Antes de dejar que un agente gaste presupuesto publicitario real conviene…","opciones":["Probar con topes bajos y revisar cada paso antes de ampliar","Empezar con el presupuesto completo para tener datos rápido","Darle acceso total y revisar los resultados a fin de mes","Desactivar las alertas de gasto para que no interrumpan"],"correcta":0,"explicacion":"Aquí los errores se pagan en dinero, no en tiempo. La escala llega después de la confianza."},{"id":55,"modulo":16,"dificultad":"media","pregunta":"La instrucción que mejor funciona con un agente es la que…","opciones":["Dice el objetivo, el contexto necesario y cómo se ve un buen resultado","Es lo más corta posible para no gastar tokens","Usa la mayor cantidad de términos técnicos","Pide varias cosas distintas a la vez para aprovechar el turno"],"correcta":0,"explicacion":"El agente no adivina tu criterio de calidad. Si no se lo dices, lo inventa."},{"id":56,"modulo":16,"dificultad":"avanzada","pregunta":"Cuando el agente se equivoca de camino, lo más eficaz es…","opciones":["Volver atrás y reformular la petición, en vez de acumular correcciones sobre el error","Repetir “no, está mal” hasta que salga bien","Cambiar de modelo cada vez que falla","Reinstalar la aplicación"],"correcta":0,"explicacion":"Corregir sobre un contexto ya contaminado suele salir peor y más caro que rehacer la petición desde un punto limpio."}]};
+
+  const PREGUNTAS = BANCO.preguntas;
+  const MODULOS = BANCO.modulos;
+
+  /* ---------- azar reproducible a partir del nombre ---------- */
+
+  function hashSemilla(str) {
+    let h = 2166136261 >>> 0;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+
+  function generador(semilla) {
+    let a = semilla >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function barajar(lista, rnd) {
+    const a = lista.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  /* ---------- estado ---------- */
+
+  const PREGUNTAS_POR_EXAMEN = 10;
+  const SEGUNDOS_POR_PREGUNTA = 45;
+
+  const cantidad = Math.min(PREGUNTAS_POR_EXAMEN, PREGUNTAS.length);
+  let examen = [];
+  let paso = 0;
+  let calificado = false;
+  let etiqueta = "";
+  let temporizadorId = null;
+
+  const $ = (id) => document.getElementById(id);
+  const norm = (s) => s.trim().toLowerCase().replace(/\s+/g, " ");
+
+  /* ---------- pantalla de arranque ---------- */
+
+  $("totalBank").textContent = PREGUNTAS.length;
+
+  $("start").addEventListener("click", empezar);
+  $("nombre").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") empezar();
+  });
+
+  /* ---------- construcción del examen ---------- */
+
+  function empezar() {
+    const nombre = $("nombre").value.trim();
+    const semilla = nombre ? hashSemilla(norm(nombre)) : (Math.random() * 4294967296) >>> 0;
+    etiqueta = nombre || "Anónimo";
+
+    const rnd = generador(semilla);
+
+    examen = barajar(PREGUNTAS, rnd)
+      .slice(0, cantidad)
+      .map((p) => {
+        const orden = barajar([0, 1, 2, 3].slice(0, p.opciones.length), rnd);
+        return { ref: p, orden, marcada: null };
+      });
+
+    calificado = false;
+    paso = 0;
+
+    $("setup").classList.remove("on");
+    $("quiz").classList.add("on");
+    $("bar").hidden = false;
+    $("barId").textContent = etiqueta;
+    $("seedNote").innerHTML =
+      `Código de este examen: <b>${semilla.toString(36).toUpperCase()}</b>. ` +
+      `Generado a partir del nombre, así que se puede volver a producir idéntico.`;
+    window.scrollTo(0, 0);
+    mostrarPregunta(paso);
+  }
+
+  const LETRAS = ["A", "B", "C", "D", "E", "F"];
+
+  function bloqueQ(item, i) {
+    const p = item.ref;
+    const opts = item.orden
+      .map((idxOriginal, pos) => `
+        <label class="opt" data-q="${i}" data-pos="${pos}">
+          <input type="radio" name="q${i}" value="${pos}">
+          <span class="opt-key">${LETRAS[pos]}</span>
+          <span class="opt-txt">${p.opciones[idxOriginal]}</span>
+        </label>`)
+      .join("");
+
+    const why = calificado
+      ? `<p class="why"><b>Respuesta:</b> ${p.opciones[item.orden[item.correcta]]}. ${p.explicacion}</p>`
+      : "";
+
+    return `
+      <div class="q" id="q${i}" role="radiogroup" aria-labelledby="t${i}">
+        <div class="q-head">
+          <div class="q-meta">
+            <span class="q-num">${String(i + 1).padStart(2, "0")}</span>
+            <span class="q-mod">Módulo ${p.modulo} · ${MODULOS[p.modulo]}</span>
+            <span class="timer" hidden></span>
+            <span class="verdict" id="v${i}" hidden></span>
+          </div>
+          <p class="q-text" id="t${i}">${p.pregunta}</p>
+        </div>
+        <div class="opts">${opts}</div>
+        ${why}
+      </div>`;
+  }
+
+  function pintarRevision() {
+    $("form").innerHTML = examen.map((item, i) => bloqueQ(item, i)).join("");
+  }
+
+  function mostrarPregunta(i) {
+    $("form").innerHTML = bloqueQ(examen[i], i);
+    $("trackFill").style.width = ((i + 1) / examen.length) * 100 + "%";
+    $("barCount").textContent = `${i + 1}/${examen.length}`;
+    $("next").textContent = i === examen.length - 1 ? "Finalizar examen" : "Siguiente";
+    iniciarTemporizador();
+    window.scrollTo(0, 0);
+  }
+
+  $("form").addEventListener("change", (e) => {
+    if (calificado) return;
+    const input = e.target;
+    if (input.type !== "radio") return;
+    const label = input.closest(".opt");
+    examen[Number(label.dataset.q)].marcada = Number(label.dataset.pos);
+  });
+
+  /* ---------- temporizador ---------- */
+
+  function detenerTemporizador() {
+    if (temporizadorId !== null) {
+      clearInterval(temporizadorId);
+      temporizadorId = null;
+    }
+  }
+
+  function iniciarTemporizador() {
+    detenerTemporizador();
+    let restante = SEGUNDOS_POR_PREGUNTA;
+    const el = document.querySelector("#form .timer");
+
+    const pintarTiempo = () => {
+      el.hidden = false;
+      el.textContent = restante + "s";
+      el.classList.toggle("urgent", restante <= 10);
+    };
+
+    pintarTiempo();
+    temporizadorId = setInterval(() => {
+      restante--;
+      if (restante < 0) {
+        avanzar();
+        return;
+      }
+      pintarTiempo();
+    }, 1000);
+  }
+
+  function avanzar() {
+    detenerTemporizador();
+    paso++;
+    if (paso >= examen.length) calificar();
+    else mostrarPregunta(paso);
+  }
+
+  /* ---------- calificación ---------- */
+
+  $("next").addEventListener("click", avanzar);
+  $("restart").addEventListener("click", () => location.reload());
+
+  function calificar() {
+    if (calificado) return;
+    calificado = true;
+    detenerTemporizador();
+
+    examen.forEach((item) => {
+      item.correcta = item.orden.indexOf(item.ref.correcta);
+    });
+    pintarRevision();
+
+    let aciertos = 0;
+    const porModulo = {};
+
+    examen.forEach((item, i) => {
+      const p = item.ref;
+      const bien = item.marcada === item.correcta;
+      if (bien) aciertos++;
+
+      porModulo[p.modulo] = porModulo[p.modulo] || { ok: 0, total: 0 };
+      porModulo[p.modulo].total++;
+      if (bien) porModulo[p.modulo].ok++;
+
+      const campo = $("q" + i);
+      campo.querySelectorAll(".opt").forEach((label) => {
+        const pos = Number(label.dataset.pos);
+        label.querySelector("input").disabled = true;
+        if (pos === item.correcta) label.classList.add("is-ok");
+        else if (pos === item.marcada) label.classList.add("is-bad");
+      });
+
+      const v = $("v" + i);
+      v.hidden = false;
+      v.className = "verdict " + (bien ? "ok" : "bad");
+      v.textContent = bien ? "Correcta" : item.marcada === null ? "Sin responder" : "Incorrecta";
+    });
+
+    document.body.classList.add("graded");
+    $("quiz").classList.add("graded");
+    $("next").hidden = true;
+    $("restart").textContent = "Hacer otro examen";
+    $("trackFill").style.width = "100%";
+    $("barCount").textContent = `${examen.length}/${examen.length}`;
+
+    const pct = Math.round((aciertos / examen.length) * 100);
+    const nota = (aciertos / examen.length) * 5;
+
+    const filas = Object.keys(porModulo)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((m) => {
+        const d = porModulo[m];
+        return `<tr>
+          <td>Módulo ${m} · ${MODULOS[m]}</td>
+          <td class="n">${d.ok}/${d.total}</td>
+        </tr>`;
+      })
+      .join("");
+
+    $("resultSlot").innerHTML = `
+      <div class="result">
+        <div class="stack" style="gap:.6rem">
+          <p class="eyebrow">Resultado · ${etiqueta}</p>
+          <div class="score">
+            <span class="score-big">${aciertos}</span>
+            <span class="score-of">de ${examen.length} · ${pct}%</span>
+            <span class="score-note">Nota sobre 5,0: <b>${nota.toFixed(1).replace(".", ",")}</b></span>
+          </div>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Desempeño por módulo</th><th class="n">Aciertos</th></tr></thead>
+            <tbody>${filas}</tbody>
+          </table>
+        </div>
+        <p style="margin:0;font-size:.92rem;color:var(--muted)">
+          Abajo quedan todas las preguntas con la respuesta correcta marcada y el porqué de cada una.
+        </p>
+      </div>`;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+</script>
